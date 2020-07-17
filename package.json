@@ -1,0 +1,39 @@
+{
+  "name": "c19",
+  "version": "1.0.1",
+  "description": "Get COVID-19 data with one command",
+  "homepage": "https://github.com/xinyangyuan/c19#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xinyangyuan/c19"
+  },
+  "bin": {
+    "c19": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "ncc build src/index.ts -w -o dist"
+  },
+  "keywords": [
+    "COVID-19",
+    "COVID",
+    "SARS-CoV-2",
+    "cli"
+  ],
+  "author": "Xinyang Yuan",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/figlet": "^1.2.0",
+    "@types/node": "^14.0.23",
+    "@types/table": "^5.0.0",
+    "@zeit/ncc": "^0.22.3",
+    "axios": "^0.19.2",
+    "chalk": "^4.1.0",
+    "commander": "^5.1.0",
+    "figlet": "^1.5.0",
+    "table": "^5.4.6",
+    "typescript": "^3.9.6"
+  }
+}
