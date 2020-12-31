@@ -8,7 +8,7 @@ const createCommand = () => {
     .description("Get latest global COVID-19 report")
     .usage("[countries...] [options]")
     .arguments("[countries...]")
-    .option("-a, --all", "Show all reported contries")
+    .option("-a, --all", "Show all reported contries/regions")
     .option("-g, --global", "Show global summary", true)
     .action(async (args: string[], cmd) => await getAction(args, cmd));
 
