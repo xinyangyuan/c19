@@ -1,6 +1,6 @@
 {
   "name": "c19",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Get COVID-19 data with one command",
   "homepage": "https://github.com/xinyangyuan/c19#readme",
   "repository": {
@@ -17,7 +17,6 @@
     "build": "ncc build src/index.ts -w -o dist",
     "prerelease": "rimraf ./dist/",
     "release": "ncc build src/index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
-    "publish": "npm release"
   },
   "keywords": [
     "COVID-19",
