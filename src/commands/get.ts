@@ -1,30 +1,16 @@
-import commander, { Command } from "commander";
-import { getSummary, getCountry } from "../actions/get";
-
-const countryList = (value: string, previous: string | string[]) => {
-  return value.toLowerCase().split(",");
-};
+import commander from "commander";
+import { get as getAction } from "../actions/get";
 
 const createCommand = () => {
-  const get = new commander.Command("get").alias("g").description("Get COVID-19 case data");
+  const get = new commander.Command("get");
 
   get
-    .command("summary", { isDefault: true })
-    .alias("s")
-    .description("Get latest daily updated COVID-19 summary")
-    .option("-c, --country <names>", "Add specified countries in CSV format", countryList)
-    .option("-g, --global", "Show global summary", true)
+    .description("Get latest global COVID-19 report")
+    .usage("[countries...] [options]")
+    .arguments("[countries...]")
     .option("-a, --all", "Show all reported contries")
-    .option("-H, --head [num]", "Show first num rows of country", "5")
-    .action(async (cmd) => await getSummary(cmd));
-
-  get
-    .command("country <name>")
-    .alias("c")
-    .description("Get COVID-19 case data by country")
-    .option("--latest", "Show latest updated data", true)
-    .option("--dayone", "Show all data from first confirmed case")
-    .action(async (countryName, cmd) => await getCountry(countryName, cmd));
+    .option("-g, --global", "Show global summary", true)
+    .action(async (args: string[], cmd) => await getAction(args, cmd));
 
   return get;
 };

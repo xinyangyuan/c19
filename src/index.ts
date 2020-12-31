@@ -2,13 +2,15 @@
 import commander from "commander";
 
 import createGetCommand from "./commands/get";
-import createListCommand from "./commands/list";
+import createCountriesCommand from "./commands/countries";
 import pkg from "../package.json";
 
 const program = new commander.Command();
 
 program
+  .name(pkg.name)
   .version(pkg.version)
+  .description(pkg.description)
   .addCommand(createGetCommand(), { isDefault: true })
-  .addCommand(createListCommand())
+  .addCommand(createCountriesCommand())
   .parse(process.argv);

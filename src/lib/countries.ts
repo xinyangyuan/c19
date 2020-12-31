@@ -1248,3 +1248,4 @@ const countries: Country[] = [
 ];
 
 export default countries;
+export { Country };

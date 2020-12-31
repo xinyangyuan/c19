@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { table, getBorderCharacters } from "table";
 import countries from "../lib/countries";
-import { count } from "console";
 
 const listCountries = () => {
   const options = {
