@@ -109,13 +109,13 @@ const getInteractive = (
       {
         type: "confirm",
         name: "check",
-        message: "Do you want to check report for a specific country?",
+        message: "Do you want to check report for a specific country/region?",
         default: false,
       },
       {
         type: "autocomplete",
         name: "country",
-        message: "Which country do you want to check?",
+        message: "Which country/region do you want to check?",
         when: (response) => response.check,
         source: (answers: string, input: string) => {
           const reportedCountries = countrySummaries.map((summary) => summary.Country);
