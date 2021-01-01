@@ -25,7 +25,7 @@
     "cli"
   ],
   "author": "Xinyang Yuan",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/figlet": "^1.2.0",
     "@types/inquirer": "^7.3.1",
