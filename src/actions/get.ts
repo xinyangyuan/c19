@@ -1,137 +1,68 @@
 import chalk from "chalk";
-import figlet from "figlet";
 import { Command } from "commander";
 import inquirer from "inquirer";
-import fuzzy from "fuzzy";
 
-import countryList, { Country } from "../lib/countries";
-import formatNumber from "../utils/format-number";
-import { COVID19API, GlobalSummary, CountrySummary } from "../lib/covid-19-api";
-
-/**
- * Utility writer function, print a new empty line
- */
-
-const writeLine = () => {
-  console.log("");
-};
-
-/**
- * Utility writer function, print a figlet gretting
- */
-
-const writeGreeting = () => {
-  console.log(figlet.textSync("COVID-19", "Slant"));
-};
-
-/**
- * Utility writer function, print global summary
- */
-
-const writeGlobalSummary = (date: string, summary: GlobalSummary) => {
-  console.log(`Global Summary (updated at ${new Date(date).toLocaleString()}):`);
-  console.log(
-    `Total Confirmed Cases: ${chalk.redBright(formatNumber(summary.TotalConfirmed))}` +
-      ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary.NewConfirmed))}` +
-      ` | Total Recovered: ${chalk.cyanBright(formatNumber(summary.TotalRecovered))}`
-  );
-};
-
-/**
- * Utility writer function, print multiple country summaries
- */
-
-const writeCountrySummaries = (date: string, summaries: CountrySummary[]) => {
-  console.log(`Global Overview: (updated at ${new Date(date).toLocaleString()}):`);
-  summaries.forEach((summary) => writeCountrySummary(summary));
-};
-
-/**
- * Utility writer function, print summary for a specific country
- */
-
-const writeCountrySummary = (summary: CountrySummary) => {
-  console.log(
-    `Country: ${chalk.whiteBright(summary.Country)} (${summary.CountryCode})` +
-      ` | Total Confirmed Cases: ${chalk.redBright(formatNumber(summary.TotalConfirmed))}` +
-      ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary.NewConfirmed))}` +
-      ` | Total Recovered: ${chalk.cyanBright(formatNumber(summary.TotalRecovered))}`
-  );
-};
-
-/**
- * Fuzzy search function over a list of countries based on user input
- */
-
-const searchCountry = (input: string, countries: Country[]) => {
-  input = input || "";
-
-  const options = {
-    pre: "<",
-    post: ">",
-    extract: (country: Country) => country.name,
-  };
-
-  const fuzzyResult = fuzzy.filter(input, countries, options);
-
-  return fuzzyResult.map((el: fuzzy.FilterResult<Country>) => el.original);
-};
+import API, { Region, Column, Summary, SummaryMap } from "../lib/api";
+import fuzzyMatchRegion from "../utils/match-region";
+import {
+  writeLine,
+  writeGreeting,
+  writeCountrySummary,
+  writeCountrySummaries,
+  writeGlobalSummary,
+} from "../utils/writer";
 
 /**
  * Show summary report by interactively asking user.
  */
 
-const getInteractive = (
-  globalSummary: GlobalSummary,
-  countrySummaries: CountrySummary[],
-  date: string
-) => {
+const getInteractive = async (summaries: SummaryMap, date: Date) => {
   // Show greetings
   writeLine();
   writeGreeting();
 
   // Show global overview summary
-  writeGlobalSummary(date, globalSummary);
+  writeGlobalSummary(summaries[Region.global], date);
   writeLine();
 
-  // Show overview of countires (top 5) with the most total confirmed cases
-  const countriesWithMostConfirmedCases: CountrySummary[] = countrySummaries
-    .sort((countryA, countryB) => +countryB.TotalConfirmed - +countryA.TotalConfirmed)
-    .slice(0, 5);
-
-  writeCountrySummaries(date, countriesWithMostConfirmedCases);
+  // Show overview of countires/regions (top 5) with the most total confirmed cases
+  const countriesWithMostConfirmedCases = Object.values(summaries)
+    .sort((regionA, regionB) => +regionB[Column.total_cases] - +regionA[Column.total_cases])
+    .slice(1, 6);
+  writeCountrySummaries(countriesWithMostConfirmedCases, date);
   writeLine();
 
   // Interactive prompt
   inquirer.registerPrompt("autocomplete", require("inquirer-autocomplete-prompt"));
-  inquirer
-    .prompt([
-      {
-        type: "confirm",
-        name: "check",
-        message: "Do you want to check report for a specific country/region?",
-        default: false,
-      },
-      {
-        type: "autocomplete",
-        name: "country",
-        message: "Which country/region do you want to check?",
-        when: (response) => response.check,
-        source: (answers: string, input: string) => {
-          const reportedCountries = countrySummaries.map((summary) => summary.Country);
-          const filteredCountryList = countryList.filter(({ name }) =>
-            reportedCountries.includes(name)
-          );
-          return searchCountry(input, filteredCountryList);
-        },
-      },
-    ])
-    .then(({ check, country }) => {
-      if (check) {
-        const countrySummary = countrySummaries.filter((summary) => summary.Country === country)[0];
-        writeCountrySummary(countrySummary);
-      }
-    });
+  const { check, region }: { check: boolean; region: string } = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "check",
+      message: "Do you want to check report for a specific country/region?",
+      default: false,
+    },
+    {
+      type: "autocomplete",
+      name: "region",
+      message: "Which country/region do you want to check?",
+      when: (response) => response.check,
+      source: (answers: string, input: string) =>
+        fuzzyMatchRegion(input).map((el) => `${el.original.name} (${el.original.iso3})`),
+    },
+  ]);
+
+  // Show country/region summary
+  if (check) {
+    console.log(region);
+    const iso = /\((.*?)\)/.exec(region) as RegExpExecArray;
+    const summary = summaries[iso[1]];
+
+    if (summary) {
+      writeCountrySummary(summary);
+    } else {
+      console.log("No data available.");
+    }
+  }
 };
 
 /**
@@ -139,48 +70,70 @@ const getInteractive = (
  */
 
 const getArgParse = (
-  countries: string[],
+  regions: string[],
+  summaries: SummaryMap,
   all: boolean,
   global: boolean,
-  globalSummary: GlobalSummary,
-  countrySummaries: CountrySummary[],
-  date: string
+  date: Date
 ) => {
   // Show greetings
   writeLine();
   writeGreeting();
 
-  // show global summary
+  // Show global summary
   if (global) {
-    writeGlobalSummary(date, globalSummary);
+    writeGlobalSummary(summaries[Region.global], date);
     writeLine();
   }
 
-  // show country summary
-  // filter countries by user input arguments
-  if (!all && countries.length !== 0) {
-    countrySummaries = countrySummaries.filter((summary) => {
-      return (
-        countries.includes(summary.Country.toLowerCase()) ||
-        countries.includes(summary.Slug.toLowerCase()) ||
-        countries.includes(summary.CountryCode.toLowerCase())
+  // Show all region summaries
+  if (all) {
+    writeCountrySummaries(Object.values(summaries), date);
+  }
+
+  //   Show countries/regions summaries
+  if (regions.length !== 0) {
+    // filter countries/regions by user input arguments
+    const matchedRegions: { region: string; iso3: string }[] = [];
+    const unknownRegions: { region: string }[] = [];
+
+    for (let region of regions) {
+      const fuzzyResults = [
+        fuzzyMatchRegion(region)[0],
+        fuzzyMatchRegion(region, "iso2")[0],
+        fuzzyMatchRegion(region, "iso3")[0],
+      ]
+        .filter((result) => result !== undefined)
+        .sort((resultA, resultB) => resultB.score - resultA.score);
+
+      if (fuzzyResults.length && fuzzyResults[0].score > 1000) {
+        matchedRegions.push({ region, iso3: fuzzyResults[0].original.iso3 });
+      } else {
+        unknownRegions.push({ region });
+      }
+    }
+
+    // show summaries
+    const matchedInputRegionString = matchedRegions.map(({ region }) => region).join(",");
+    const unknowInputRegionString = unknownRegions.map(({ region }) => region).join(",");
+
+    if (matchedRegions.length) {
+      const unmatchedRegionString = unknowInputRegionString
+        ? `; unknown: ${chalk.underline(unknowInputRegionString)}`
+        : "";
+      console.log(
+        `Country Overview (found: ${
+          chalk.underline(matchedInputRegionString) + unmatchedRegionString
+        }):`
       );
-    });
-  }
+      matchedRegions.forEach(({ iso3 }) => writeCountrySummary(summaries[iso3]));
+    }
 
-  // sort and truncate countries
-  if (countries.length === 0) {
-    // descending orderBy totalConfirmed
-    countrySummaries.sort(
-      (countryA, countryB) => +countryB.TotalConfirmed - +countryA.TotalConfirmed
-    );
-    countrySummaries = countrySummaries.slice(0, 5);
+    // show unknow input arguments
+    if (!matchedRegions.length && unknownRegions.length) {
+      console.log("Unknown Input Country/Region: " + chalk.underline(unknowInputRegionString));
+    }
   }
-
-  // print country summary
-  console.log(`Country Overview (for ${countries}):`);
-  countrySummaries.forEach((summary) => writeCountrySummary(summary));
-  writeLine();
 };
 
 /**
@@ -190,19 +143,20 @@ const getArgParse = (
 const get = async (args: string[], cmd: Command) => {
   // Unpack options
   const { global, all } = cmd;
-  const countries = args
+  const regions = args
     .map((arg) => arg.toLowerCase().split(","))
     .reduce((acc, nxt) => [...acc, ...nxt], []);
 
   // Fetch data from API
-  const api = new COVID19API();
-  const { Global: globalSummary, Countries: countrySummaries, Date: date } = await api.fetch();
+  const api = new API();
+  const summaries = await api.fetch();
+  const date = api.updatedDate as Date;
 
   // Interactive or ArgParse Mode
   if (!process.argv[2]) {
-    getInteractive(globalSummary, countrySummaries, date);
+    getInteractive(summaries, date);
   } else {
-    getArgParse(countries, all, global, globalSummary, countrySummaries, date);
+    getArgParse(regions, summaries, all, global, date);
   }
 };
 

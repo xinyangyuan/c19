@@ -2,7 +2,7 @@
 import commander from "commander";
 
 import createGetCommand from "./commands/get";
-import createCountriesCommand from "./commands/countries";
+import createRegionsCommand from "./commands/regions";
 import pkg from "../package.json";
 
 const program = new commander.Command();
@@ -12,5 +12,5 @@ program
   .version(pkg.version)
   .description(pkg.description)
   .addCommand(createGetCommand(), { isDefault: true })
-  .addCommand(createCountriesCommand())
+  .addCommand(createRegionsCommand())
   .parse(process.argv);

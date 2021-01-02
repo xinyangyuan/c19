@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import { table, getBorderCharacters } from "table";
-import countries from "../lib/countries";
 
-const listCountries = () => {
+import regions from "../lib/regions";
+
+const listRegions = () => {
   const options = {
     border: getBorderCharacters(`void`),
     columnDefault: {
@@ -15,16 +16,12 @@ const listCountries = () => {
   console.log(
     table(
       [
-        ["NAME", "SLUG", "ISO2"],
-        ...countries.map((country) => [
-          country.name,
-          chalk.whiteBright(country.slug),
-          country.iso2,
-        ]),
+        ["NAME", "ISO2", "ISO3"],
+        ...regions.map((country) => [country.name, country.iso2, chalk.whiteBright(country.iso3)]),
       ],
       options
     )
   );
 };
 
-export { listCountries };
+export { listRegions };
