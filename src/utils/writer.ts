@@ -53,7 +53,7 @@ const writeCountrySummaries = (summaries: Summary[], date: Date) => {
 
 const writeCountrySummary = (summary: Summary) => {
   console.log(
-    `Country: ${chalk.whiteBright(summary[Column.location])} (${summary[Column.iso_code]})` +
+    `Country/Region: ${chalk.whiteBright(summary[Column.location])} (${summary[Column.iso_code]})` +
       ` | Total Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.total_cases]))}` +
       ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.new_cases]))}` +
       ` | Total Vaccinations (per hundred): ${chalk.cyanBright(

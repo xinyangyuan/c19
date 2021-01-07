@@ -6,3 +6,6 @@ release:
 
 publish:
 	npm publish
+
+list-package:
+	npm pack && tar -xvzf *.tgz && rm -rf package *.tgz

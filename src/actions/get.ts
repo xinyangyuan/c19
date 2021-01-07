@@ -99,12 +99,19 @@ const getArgParse = (
 
     for (let region of regions) {
       const fuzzyResults = [
-        fuzzyMatchRegion(region)[0],
-        fuzzyMatchRegion(region, "iso2")[0],
-        fuzzyMatchRegion(region, "iso3")[0],
+        fuzzyMatchRegion(region),
+        fuzzyMatchRegion(region, "iso2"),
+        fuzzyMatchRegion(region, "iso3"),
       ]
+        .flat()
         .filter((result) => result !== undefined)
-        .sort((resultA, resultB) => resultB.score - resultA.score);
+        .sort((resultA, resultB) =>
+          // (1) sort by score
+          // (2) if scores are euqal, prefer shorter region name
+          resultB.score - resultA.score === 0
+            ? resultA.original.name.length - resultB.original.name.length
+            : resultB.score - resultA.score
+        );
 
       if (fuzzyResults.length && fuzzyResults[0].score > 1000) {
         matchedRegions.push({ region, iso3: fuzzyResults[0].original.iso3 });
