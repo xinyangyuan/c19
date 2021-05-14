@@ -25,9 +25,9 @@ const getInteractive = async (summaries: SummaryMap, date: Date) => {
   writeGlobalSummary(summaries[Region.global], date);
   writeLine();
 
-  // Show overview of countires/regions (top 5) with the most total confirmed cases
+  // Show overview of countires/regions (top 5) with the most new confirmed cases
   const countriesWithMostConfirmedCases = Object.values(summaries)
-    .sort((regionA, regionB) => +regionB[Column.total_cases] - +regionA[Column.total_cases])
+    .sort((regionA, regionB) => +regionB[Column.new_cases] - +regionA[Column.new_cases])
     .slice(1, 6);
   writeCountrySummaries(countriesWithMostConfirmedCases, date);
   writeLine();

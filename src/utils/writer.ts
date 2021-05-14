@@ -29,10 +29,10 @@ const writeGlobalSummary = (summary: Summary, date: Date) => {
   console.log(
     `Total Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.total_cases]))}` +
       ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.new_cases]))}` +
-      ` | Total Vaccinations (per hundred): ${chalk.cyanBright(
-        formatNumber(summary[Column.total_vaccinations]) +
+      ` | Total People Vaccinated (per hundred): ${chalk.cyanBright(
+        formatNumber(summary[Column.people_vaccinated]) +
           " (" +
-          formatNumber(summary[Column.total_vaccinations_per_hundred]) +
+          formatNumber(summary[Column.people_vaccinated_per_hundred]) +
           ")"
       )}`
   );
@@ -43,7 +43,7 @@ const writeGlobalSummary = (summary: Summary, date: Date) => {
  */
 
 const writeCountrySummaries = (summaries: Summary[], date: Date) => {
-  console.log(`Global Overview: (updated at ${date.toLocaleString()}):`);
+  console.log(`Global Overview: (sort by new confirmed cases - updated at ${date.toLocaleString()}):`);
   summaries.forEach((summary) => writeCountrySummary(summary));
 };
 
@@ -56,10 +56,10 @@ const writeCountrySummary = (summary: Summary) => {
     `Country/Region: ${chalk.whiteBright(summary[Column.location])} (${summary[Column.iso_code]})` +
       ` | Total Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.total_cases]))}` +
       ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.new_cases]))}` +
-      ` | Total Vaccinations (per hundred): ${chalk.cyanBright(
-        formatNumber(summary[Column.total_vaccinations]) +
+      ` | Total People Vaccinated (per hundred): ${chalk.cyanBright(
+        formatNumber(summary[Column.people_vaccinated]) +
           " (" +
-          formatNumber(summary[Column.total_vaccinations_per_hundred]) +
+          formatNumber(summary[Column.people_vaccinated_per_hundred]) +
           ")"
       )}`
   );

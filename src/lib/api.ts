@@ -46,9 +46,13 @@ enum Column {
   tests_per_case,
   tests_units,
   total_vaccinations,
+  people_vaccinated,
+  people_fully_vaccinated,
   new_vaccinations,
   new_vaccinations_smoothed,
   total_vaccinations_per_hundred,
+  people_vaccinated_per_hundred,
+  people_fully_vaccinated_per_hundred,
   new_vaccinations_smoothed_per_million,
   stringency_index,
   population,
@@ -65,7 +69,7 @@ enum Column {
   handwashing_facilities,
   hospital_beds_per_thousand,
   life_expectancy,
-  human_development_index,
+  human_development_index
 }
 
 /**
