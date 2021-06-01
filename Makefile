@@ -1,3 +1,5 @@
+.PHONY: run release publish list-package
+
 run:
 	npm run build
 
