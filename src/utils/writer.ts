@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import figlet from "figlet";
 
+import { Column, Summary } from "../lib/api";
 import formatNumber from "../utils/format-number";
-import { Summary, Column } from "../lib/api";
+import roundNumber from "../utils/round-number";
 
 /**
  * Utility writer function, print a new empty line
@@ -28,7 +29,7 @@ const writeGlobalSummary = (summary: Summary, date: Date) => {
   console.log(`Global Summary (updated at ${date.toLocaleString()}):`);
   console.log(
     `Total Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.total_cases]))}` +
-      ` | New Confirmed Cases: ${chalk.redBright(formatNumber(summary[Column.new_cases]))}` +
+      ` | New Confirmed Cases (smoothed): ${chalk.redBright(formatNumber(roundNumber(summary[Column.new_cases_smoothed])))}` +
       ` | Total People Vaccinated (per hundred): ${chalk.cyanBright(
         formatNumber(summary[Column.people_vaccinated]) +
           " (" +

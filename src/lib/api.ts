@@ -36,8 +36,8 @@ enum Column {
   weekly_icu_admissions_per_million,
   weekly_hosp_admissions,
   weekly_hosp_admissions_per_million,
-  new_tests,
   total_tests,
+  new_tests,
   total_tests_per_thousand,
   new_tests_per_thousand,
   new_tests_smoothed,
@@ -48,14 +48,17 @@ enum Column {
   total_vaccinations,
   people_vaccinated,
   people_fully_vaccinated,
+  total_boosters,
   new_vaccinations,
   new_vaccinations_smoothed,
   total_vaccinations_per_hundred,
   people_vaccinated_per_hundred,
   people_fully_vaccinated_per_hundred,
+  total_boosters_per_hundred,
   new_vaccinations_smoothed_per_million,
+  new_people_vaccinated_smoothed,
+  new_people_vaccinated_smoothed_per_hundred,
   stringency_index,
-  population,
   population_density,
   median_age,
   aged_65_older,
@@ -69,7 +72,12 @@ enum Column {
   handwashing_facilities,
   hospital_beds_per_thousand,
   life_expectancy,
-  human_development_index
+  human_development_index,
+  population,
+  excess_mortality_cumulative_absolute,
+  excess_mortality_cumulative,
+  excess_mortality,
+  excess_mortality_cumulative_per_million
 }
 
 /**
@@ -168,7 +176,7 @@ class API {
     // Fetch data
     const [{ data }, { data: updatedTimestamp }] = await Promise.all([
       axios.get<string>(this.URL),
-      axios.get<string>(API.baseURL + "owid-covid-data-last-updated-timestamp.txt"),
+      axios.get<string>(API.baseURL + "internal/timestamp/owid-covid-data-last-updated-timestamp-root.txt"),
     ]);
 
     // Store data

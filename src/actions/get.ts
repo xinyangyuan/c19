@@ -2,14 +2,14 @@ import chalk from "chalk";
 import { Command } from "commander";
 import inquirer from "inquirer";
 
-import API, { Region, Column, SummaryMap } from "../lib/api";
+import API, { Column, Region, SummaryMap } from "../lib/api";
 import fuzzyMatchRegion from "../utils/match-region";
 import {
-  writeLine,
-  writeGreeting,
-  writeCountrySummary,
   writeCountrySummaries,
+  writeCountrySummary,
   writeGlobalSummary,
+  writeGreeting,
+  writeLine,
 } from "../utils/writer";
 
 /**
